@@ -164,11 +164,9 @@ module Fedex
               xml.Units package[:weight][:units]
               xml.Value package[:weight][:value]
             }
-            xml.Dimensions{
-              xml.Length package[:dimensions][:length]
-              xml.Width package[:dimensions][:width]
-              xml.Height package[:dimensions][:height]
-              xml.Units package[:dimensions][:units]
+            xml.CustomerReferences {
+              xml.CustomerReferenceType "CUSTOMER_REFERENCE"
+              xml.Value package[:shipment_number]
             }
           }
         end
