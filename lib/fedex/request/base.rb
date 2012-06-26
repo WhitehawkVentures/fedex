@@ -47,7 +47,7 @@ module Fedex
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages, :service_type)
         @credentials = credentials
-        @shipper, @recipient, @packages, @service_type, @customs_clearance, @debug, @label_type = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance], options[:debug], options[:label_type]
+        @shipper, @recipient, @packages, @service_type, @customs_clearance, @debug, @label_type, @printed_label_origin = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance], options[:debug], options[:label_type], options[:printed_label_origin]
         @shipping_options =  options[:shipping_options] ||={}
       end
 
@@ -117,6 +117,26 @@ module Fedex
             xml.StateOrProvinceCode @shipper[:state]
             xml.PostalCode @shipper[:postal_code]
             xml.CountryCode @shipper[:country_code]
+          }
+        }
+      end
+      
+      # Add printed label origin to xml request
+      def add_printed_label_origin(xml)
+        xml.PrintedLabelOrigin{
+          xml.Contact{
+            xml.PersonName @printed_label_origin[:name]
+            xml.CompanyName @printed_label_origin[:company]
+            xml.PhoneNumber @printed_label_origin[:phone_number]
+          }
+          xml.Address {
+            Array(@printed_label_origin[:address]).take(2).each do |address_line|
+              xml.StreetLines address_line
+            end
+            xml.City @printed_label_origin[:city]
+            xml.StateOrProvinceCode @printed_label_origin[:state]
+            xml.PostalCode @printed_label_origin[:postal_code]
+            xml.CountryCode @printed_label_origin[:country_code]
           }
         }
       end

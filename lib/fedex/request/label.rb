@@ -46,6 +46,7 @@ module Fedex
             xml.LabelFormatType "COMMON2D"
             xml.ImageType @label_type
             xml.LabelStockType @label_type == "EPL2" ? "STOCK_4X6" : "PAPER_8.5X11_TOP_HALF_LABEL"
+            add_printed_label_origin(xml) if @printed_label_origin
           }
           xml.RateRequestTypes "ACCOUNT"
           add_packages(xml)
