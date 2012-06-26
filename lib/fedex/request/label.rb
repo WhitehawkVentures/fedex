@@ -44,8 +44,8 @@ module Fedex
           add_customs_clearance(xml) if @customs_clearance
           xml.LabelSpecification {
             xml.LabelFormatType "COMMON2D"
-            xml.ImageType "EPL2"
-            xml.LabelStockType "STOCK_4X6"
+            xml.ImageType @label_type
+            xml.LabelStockType @label_type == "EPL2" ? "STOCK_4X6" : "PAPER_8.5X11_TOP_HALF_LABEL"
           }
           xml.RateRequestTypes "ACCOUNT"
           add_packages(xml)
