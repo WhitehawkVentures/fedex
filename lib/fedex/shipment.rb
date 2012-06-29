@@ -1,6 +1,7 @@
 require 'fedex/credentials'
 require 'fedex/request/label'
 require 'fedex/request/rate'
+require 'fedex/request/address_validation'
 
 module Fedex
   class Shipment
@@ -33,6 +34,10 @@ module Fedex
     # @param [String] service_type, A valid fedex service type, to view a complete list of services Fedex::Shipment::SERVICE_TYPES
     def rate(options = {})
       Request::Rate.new(@credentials, options).process_request
+    end
+    
+    def verify_residential(options = {})
+      Request::AddressValidation.new(@credentials, options).process_request
     end
 
   end

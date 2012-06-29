@@ -52,4 +52,5 @@ module Fedex
   require 'fedex/version'
   #Exceptions: Fedex::RateError
   class RateError < StandardError; end
+  class AddressValidationError < StandardError; end
 end
