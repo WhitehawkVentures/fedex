@@ -6,6 +6,7 @@ module Fedex
   module Request
     class Label < Base
       def initialize(credentials, options={})
+        requires!(options, :shipper, :recipient, :packages, :service_type)
         super(credentials, options)
       end
 

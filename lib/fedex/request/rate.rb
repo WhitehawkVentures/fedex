@@ -3,6 +3,11 @@ require 'fedex/request/base'
 module Fedex
   module Request
     class Rate < Base
+      def initialize(credentials, options={})
+        requires!(options, :shipper, :recipient, :packages, :service_type)
+        super(credentials, options)
+      end
+      
       # Sends post request to Fedex web service and parse the response, a Rate object is created if the response is successful
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)

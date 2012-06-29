@@ -3,13 +3,21 @@ require 'fedex/request/base'
 module Fedex
   module Request
     class AddressValidation < Base
-      # Sends post request to Fedex web service and parse the response, a Rate object is created if the response is successful
+      VERSION = 2
+      
+      def initialize(credentials, options={})
+        requires!(options, :recipient)
+        super(credentials, options)
+      end
+      
+      # Sends post request to Fedex web service and parse the response
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
         puts api_response if @debug == true
         response = parse_response(api_response)
         if success?(response)
-          ["UNDETERMINED", "RESIDENTIAL", "INSUFFICIENT_DATA", "UNAVAILABLE", "NOT_APPLICABLE_TO_COUNTRY"].include?(response[:address_validation_reply][:address_results][0][:address_validation_result][:proposed_address_details][:residential_status]) ? true : false
+          # puts response.inspect
+          return response[:address_validation_reply][:address_results][:proposed_address_details]
         else
           puts api_response
           error_message = if response[:address_validation_reply]
@@ -37,14 +45,22 @@ module Fedex
           }
         }
       end
+      
+      def add_options(xml)
+        xml.Options{
+          xml.CheckResidentialStatus true
+        }
+      end
 
       # Build xml Fedex Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
-          xml.AddressValidationRequest(:xmlns => "http://fedex.com/ws/addressvalidation/v10"){
+          xml.AddressValidationRequest(:xmlns => "http://fedex.com/ws/addressvalidation/v2"){
             add_web_authentication_detail(xml)
             add_client_detail(xml)
             add_version(xml)
+            add_request_timestamp(xml)
+            add_options(xml)
             add_address(xml)
           }
         end

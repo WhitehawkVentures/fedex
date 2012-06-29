@@ -45,7 +45,7 @@ module Fedex
       #
       # return a Fedex::Request::Base object
       def initialize(credentials, options={})
-        requires!(options, :shipper, :recipient, :packages, :service_type)
+        # requires!(options, :shipper, :recipient, :packages, :service_type)
         @credentials = credentials
         @shipper, @recipient, @packages, @service_type, @customs_clearance, @debug, @label_type, @printed_label_origin = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance], options[:debug], options[:label_type], options[:printed_label_origin]
         @shipping_options =  options[:shipping_options] ||={}
@@ -80,7 +80,7 @@ module Fedex
       def add_version(xml)
         xml.Version{
           xml.ServiceId service_id
-          xml.Major VERSION
+          xml.Major self.class::VERSION
           xml.Intermediate 0
           xml.Minor 0
         }
@@ -197,6 +197,10 @@ module Fedex
         xml.CustomsClearanceDetail{
           customs_to_xml(xml, @customs_clearance)
         }
+      end
+      
+      def add_request_timestamp(xml)
+        xml.RequestTimestamp Time.now.xmlschema
       end
 
       # Fedex Web Service Api
