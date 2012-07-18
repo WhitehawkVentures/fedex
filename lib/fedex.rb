@@ -53,4 +53,5 @@ module Fedex
   #Exceptions: Fedex::RateError
   class RateError < StandardError; end
   class AddressValidationError < StandardError; end
+  class TrackError < StandardError; end
 end
