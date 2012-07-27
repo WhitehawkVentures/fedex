@@ -15,12 +15,19 @@ module Fedex
       # a PDF file is created with the label at the specified location.
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
+        Rails.logger.info(build_xml)
         puts api_response if @debug == true
         response = parse_response(api_response)
         if success?(response)
+          Rails.logger.info(response.inspect)
           # create_pdf(label_details)
-          { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:label][:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:tracking_ids][:tracking_number] }
+          if service_type.include?("FREIGHT")
+            { :freight_address_label => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].first[:parts][:image], :outbound_label => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].first[:parts][:image] }
+          else
+            { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:label][:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:tracking_ids][:tracking_number] }
+          end
         else
+          Rails.logger.info(response.inspect)
           error_message = if response[:process_shipment_reply]
             [response[:process_shipment_reply][:notifications]].flatten.first[:message]
           else
@@ -43,14 +50,34 @@ module Fedex
           add_recipient(xml)
           add_shipping_charges_payment(xml)
           add_customs_clearance(xml) if @customs_clearance
+          if service_type.include?("FREIGHT")
+            add_freight_shipment_detail(xml)
+          end
           xml.LabelSpecification {
-            xml.LabelFormatType "COMMON2D"
-            xml.ImageType @label_type
-            xml.LabelStockType @label_type == "EPL2" ? "STOCK_4X6" : "PAPER_8.5X11_TOP_HALF_LABEL"
+            xml.LabelFormatType service_type.include?("FREIGHT") ? "VICS_BILL_OF_LADING" : "COMMON2D"
+            xml.ImageType service_type.include?("FREIGHT") ? "PDF" : @label_type
+            xml.LabelStockType @label_type == "EPL2" ? "STOCK_4X6" : (service_type.include?("FREIGHT") ? "PAPER_LETTER" : "PAPER_8.5X11_TOP_HALF_LABEL")
             add_printed_label_origin(xml) if @printed_label_origin
           }
+          if service_type.include?("FREIGHT")
+            xml.ShippingDocumentSpecification {
+              xml.ShippingDocumentTypes "FREIGHT_ADDRESS_LABEL"
+              xml.FreightAddressLabelDetail {
+                xml.Format {
+                  xml.ImageType 'PDF'
+                  xml.StockType 'PAPER_4X6'
+                  xml.ProvideInstructions true
+                }
+              }
+            }
+          end
           xml.RateRequestTypes "ACCOUNT"
-          add_packages(xml)
+          # unless service_type.include?("FREIGHT")
+            add_packages(xml)
+          # else
+            # add_package_detail(xml)
+          # end
+          
         }
       end
 

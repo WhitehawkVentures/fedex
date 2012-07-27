@@ -48,6 +48,7 @@ module Fedex
         # requires!(options, :shipper, :recipient, :packages, :service_type)
         @credentials = credentials
         @shipper, @recipient, @packages, @service_type, @customs_clearance, @debug, @label_type, @printed_label_origin = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance], options[:debug], options[:label_type], options[:printed_label_origin]
+        @freight_address, @freight_contact = options[:freight_address], options[:freight_contact]
         @shipping_options =  options[:shipping_options] ||={}
       end
 
@@ -190,6 +191,88 @@ module Fedex
             }
           }
         end
+      end
+      
+      def add_freight_shipment_detail(xml)
+        xml.FreightShipmentDetail {
+          xml.FedExFreightAccountNumber @credentials.freight_account_number
+          xml.FedExFreightBillingContactAndAddress {
+            xml.Contact{
+              xml.PersonName @freight_contact[:person_name]
+              xml.Title @freight_contact[:title]
+              xml.CompanyName @freight_contact[:company_name]
+              xml.PhoneNumber @freight_contact[:phone_number]
+            }
+            xml.Address {
+              Array(@freight_address[:address]).take(2).each do |address_line|
+                xml.StreetLines address_line
+              end
+              xml.City @freight_address[:city]
+              xml.StateOrProvinceCode @freight_address[:state]
+              xml.PostalCode @freight_address[:postal_code]
+              xml.CountryCode @freight_address[:country_code]
+            }
+          }
+          xml.PrintedReferences {
+            xml.Type "SHIPPER_ID_NUMBER"
+            xml.Value @packages.first[:shipment_number]
+          }
+          xml.Role "SHIPPER"
+          xml.PaymentType "PREPAID"
+          xml.CollectTermsType "STANDARD"
+          xml.DeclaredValuePerUnit {
+            xml.Currency 'USD'
+            xml.Amount 50
+          }
+          xml.LiabilityCoverageDetail {
+            xml.CoverageType "NEW"
+            xml.CoverageAmount {
+              xml.Currency "USD"
+              xml.Amount 50
+            }
+          }
+          xml.TotalHandlingUnits 1
+          xml.ClientDiscountPercent 0
+          xml.PalletWeight {
+            xml.Units 'LB'
+            xml.Value 20
+          }
+          xml.ShipmentDimensions {
+            xml.Length 180
+            xml.Width 93
+            xml.Height 106
+            xml.Units "IN"
+          }
+          xml.LineItems {
+            xml.FreightClass 'CLASS_050'
+            xml.ClassProvidedByCustomer true
+            xml.HandlingUnits 1
+            xml.Packaging 'BOX'
+            xml.Pieces 1
+            xml.BillOfLadingNumber "BOL_NUM"
+            xml.PurchaseOrderNumber @packages.first[:shipment_number]
+            xml.Description "Heavy Stuff"
+            xml.Weight {
+              xml.Units @packages.first[:weight][:units]
+              xml.Value @packages.first[:weight][:value]
+            }
+            xml.Dimensions {
+              xml.Length 180
+              xml.Width 93
+              xml.Height 106
+              xml.Units "IN"
+            }
+            xml.Volume {
+              xml.Units 'CUBIC_FT'
+              xml.Value 30
+            }
+          }
+        }
+      end
+      
+      def add_package_detail(xml)
+        xml.PackageCount 1
+        xml.PackageDetail 'INDIVIDUAL_PACKAGES'
       end
 
       # Add customs clearance(for international shipments)

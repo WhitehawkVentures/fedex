@@ -3,7 +3,7 @@ require 'fedex/helpers'
 module Fedex
   class Credentials
     include Helpers
-    attr_reader :key, :password, :account_number, :meter, :mode
+    attr_reader :key, :password, :account_number, :meter, :mode, :freight_account_number
 
     # In order to use Fedex rates API you must first apply for a developer(and later production keys),
     # Visit {http://www.fedex.com/us/developer/ Fedex Developer Center} for more information about how to obtain your keys.
@@ -21,6 +21,7 @@ module Fedex
       @account_number = options[:account_number]
       @meter = options[:meter]
       @mode = options[:mode]
+      @freight_account_number = options[:freight_account]
     end
   end
 end
