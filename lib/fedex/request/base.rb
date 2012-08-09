@@ -186,9 +186,9 @@ module Fedex
               xml.Value package[:weight][:value]
             }
             xml.Dimensions {
-              xml.Length package[:dimensions][:length]
-              xml.Width package[:dimensions][:width]
-              xml.Height package[:dimensions][:height]
+              xml.Length package[:dimensions][:length].to_i
+              xml.Width package[:dimensions][:width].to_i
+              xml.Height package[:dimensions][:height].to_i
               xml.Units package[:dimensions][:units]
             } if package[:dimensions]
             xml.CustomerReferences {
