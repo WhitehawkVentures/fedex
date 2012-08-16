@@ -22,7 +22,7 @@ module Fedex
           Rails.logger.info(response.inspect)
           # create_pdf(label_details)
           if service_type.include?("FREIGHT")
-            { :freight_address_label => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].first[:parts][:image], :outbound_label => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].first[:parts][:image] }
+            { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].first[:parts][:image], :encoded_bol => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].second[:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:master_tracking_id][:tracking_number] }
           else
             { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:label][:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:tracking_ids][:tracking_number] }
           end
@@ -56,7 +56,7 @@ module Fedex
           xml.LabelSpecification {
             xml.LabelFormatType service_type.include?("FREIGHT") ? "VICS_BILL_OF_LADING" : "COMMON2D"
             xml.ImageType service_type.include?("FREIGHT") ? "PDF" : @label_type
-            xml.LabelStockType @label_type == "EPL2" ? "STOCK_4X6" : (service_type.include?("FREIGHT") ? "PAPER_LETTER" : "PAPER_8.5X11_TOP_HALF_LABEL")
+            xml.LabelStockType service_type.include?("FREIGHT") ? "PAPER_LETTER" : (@label_type == "EPL2" ? "STOCK_4X6" : "PAPER_8.5X11_TOP_HALF_LABEL")
             add_printed_label_origin(xml) if @printed_label_origin
           }
           if service_type.include?("FREIGHT")
@@ -64,8 +64,8 @@ module Fedex
               xml.ShippingDocumentTypes "FREIGHT_ADDRESS_LABEL"
               xml.FreightAddressLabelDetail {
                 xml.Format {
-                  xml.ImageType 'PDF'
-                  xml.StockType 'PAPER_4X6'
+                  xml.ImageType @label_type
+                  xml.StockType @label_type == "EPL2" ? "STOCK_4X6" : "PAPER_4X6"
                   xml.ProvideInstructions true
                 }
               }

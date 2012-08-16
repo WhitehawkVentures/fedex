@@ -219,59 +219,40 @@ module Fedex
               xml.CountryCode @freight_address[:country_code]
             }
           }
-          xml.PrintedReferences {
-            xml.Type "SHIPPER_ID_NUMBER"
-            xml.Value @packages.first[:shipment_number]
-          }
-          xml.Role "SHIPPER"
+          xml.Role @credentials.mode == "production" ? "THIRD_PARTY" : "SHIPPER"
           xml.PaymentType "PREPAID"
           xml.CollectTermsType "STANDARD"
-          xml.DeclaredValuePerUnit {
-            xml.Currency 'USD'
-            xml.Amount 50
-          }
-          xml.LiabilityCoverageDetail {
-            xml.CoverageType "NEW"
-            xml.CoverageAmount {
-              xml.Currency "USD"
-              xml.Amount 50
-            }
-          }
           xml.TotalHandlingUnits 1
           xml.ClientDiscountPercent 0
           xml.PalletWeight {
-            xml.Units 'LB'
-            xml.Value 20
+            xml.Units @packages.first[:weight][:units]
+            xml.Value @packages.first[:weight][:value]
           }
           xml.ShipmentDimensions {
-            xml.Length 180
-            xml.Width 93
-            xml.Height 106
-            xml.Units "IN"
-          }
+            xml.Length @packages.first[:dimensions][:length].to_i
+            xml.Width @packages.first[:dimensions][:width].to_i
+            xml.Height @packages.first[:dimensions][:height].to_i
+            xml.Units @packages.first[:dimensions][:units]
+          } if @packages.first[:dimensions]
           xml.LineItems {
             xml.FreightClass 'CLASS_050'
-            xml.ClassProvidedByCustomer true
+            xml.ClassProvidedByCustomer false
             xml.HandlingUnits 1
             xml.Packaging 'BOX'
             xml.Pieces 1
-            xml.BillOfLadingNumber "BOL_NUM"
+            xml.BillOfLadingNumber @packages.first[:shipment_number]
             xml.PurchaseOrderNumber @packages.first[:shipment_number]
-            xml.Description "Heavy Stuff"
+            xml.Description "Furniture"
             xml.Weight {
               xml.Units @packages.first[:weight][:units]
               xml.Value @packages.first[:weight][:value]
             }
             xml.Dimensions {
-              xml.Length 180
-              xml.Width 93
-              xml.Height 106
-              xml.Units "IN"
-            }
-            xml.Volume {
-              xml.Units 'CUBIC_FT'
-              xml.Value 30
-            }
+              xml.Length @packages.first[:dimensions][:length].to_i
+              xml.Width @packages.first[:dimensions][:width].to_i
+              xml.Height @packages.first[:dimensions][:height].to_i
+              xml.Units @packages.first[:dimensions][:units]
+            } if @packages.first[:dimensions]
           }
         }
       end
