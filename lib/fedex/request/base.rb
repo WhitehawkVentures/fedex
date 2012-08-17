@@ -240,7 +240,6 @@ module Fedex
             xml.HandlingUnits 1
             xml.Packaging 'BOX'
             xml.Pieces 1
-            xml.BillOfLadingNumber @packages.first[:shipment_number]
             xml.PurchaseOrderNumber @packages.first[:shipment_number]
             xml.Description "Furniture"
             xml.Weight {
