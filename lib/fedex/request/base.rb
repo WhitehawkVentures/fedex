@@ -219,7 +219,7 @@ module Fedex
               xml.CountryCode @freight_address[:country_code]
             }
           }
-          xml.Role @credentials.mode == "production" ? "THIRD_PARTY" : "SHIPPER"
+          xml.Role "THIRD_PARTY"
           xml.PaymentType "PREPAID"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
