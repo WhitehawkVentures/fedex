@@ -4,18 +4,19 @@ module Fedex
   module Request
     class Rate < Base
       def initialize(credentials, options={})
-        requires!(options, :shipper, :recipient, :packages, :service_type)
+        requires!(options, :shipper, :recipient, :packages)
         super(credentials, options)
       end
       
       # Sends post request to Fedex web service and parse the response, a Rate object is created if the response is successful
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
+        Rails.logger.info(build_xml)
         puts api_response if @debug == true
         response = parse_response(api_response)
         if success?(response)
-          rate_details = [response[:rate_reply][:rate_reply_details][:rated_shipment_details]].flatten.first[:shipment_rate_detail]
-          Fedex::Rate.new(rate_details)
+          rate_details = response[:rate_reply][:rate_reply_details]
+          # Fedex::Rate.new(rate_details)
         else
           error_message = if response[:rate_reply]
             [response[:rate_reply][:notifications]].flatten.first[:message]
@@ -30,16 +31,18 @@ module Fedex
 
       # Add information for shipments
       def add_requested_shipment(xml)
+        xml.ReturnTransitAndCommit true
         xml.RequestedShipment{
           xml.DropoffType @shipping_options[:drop_off_type] ||= "REGULAR_PICKUP"
-          xml.ServiceType service_type
+          xml.ServiceType service_type if service_type
           xml.PackagingType @shipping_options[:packaging_type] ||= "YOUR_PACKAGING"
           add_shipper(xml)
           add_recipient(xml)
           add_shipping_charges_payment(xml)
           add_customs_clearance(xml) if @customs_clearance
+          add_freight_shipment_detail(xml) if @freight_address
           xml.RateRequestTypes "ACCOUNT"
-          add_packages(xml)
+          add_packages(xml) unless @freight_address
         }
       end
 
