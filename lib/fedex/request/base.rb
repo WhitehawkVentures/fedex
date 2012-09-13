@@ -49,6 +49,7 @@ module Fedex
         @credentials = credentials
         @shipper, @recipient, @packages, @service_type, @customs_clearance, @debug, @label_type, @printed_label_origin = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance], options[:debug], options[:label_type], options[:printed_label_origin]
         @freight_address, @freight_contact = options[:freight_address], options[:freight_contact]
+        @description = options[:description]
         @shipping_options =  options[:shipping_options] ||={}
       end
 
@@ -219,7 +220,7 @@ module Fedex
               xml.CountryCode @freight_address[:country_code]
             }
           }
-          xml.Role @credentials.mode == "production" ? "THIRD_PARTY" : "SHIPPER"
+          xml.Role "THIRD_PARTY"
           xml.PaymentType "PREPAID"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
@@ -235,13 +236,13 @@ module Fedex
             xml.Units @packages.first[:dimensions][:units]
           } if @packages.first[:dimensions]
           xml.LineItems {
-            xml.FreightClass 'CLASS_050'
+            xml.FreightClass 'CLASS_085'
             xml.ClassProvidedByCustomer false
             xml.HandlingUnits 1
             xml.Packaging 'BOX'
             xml.Pieces 1
             xml.PurchaseOrderNumber @packages.first[:shipment_number]
-            xml.Description "Furniture"
+            xml.Description @description && !@description.blank? ? @description : "Furniture"
             xml.Weight {
               xml.Units @packages.first[:weight][:units]
               xml.Value @packages.first[:weight][:value]
