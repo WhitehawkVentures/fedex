@@ -54,4 +54,5 @@ module Fedex
   class RateError < StandardError; end
   class AddressValidationError < StandardError; end
   class TrackError < StandardError; end
+  class PickUpError < StandardError; end
 end

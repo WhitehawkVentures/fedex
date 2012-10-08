@@ -3,6 +3,8 @@ require 'fedex/request/label'
 require 'fedex/request/rate'
 require 'fedex/request/address_validation'
 require 'fedex/request/track'
+require 'fedex/request/pickup'
+require 'fedex/request/cancel_pickup'
 
 module Fedex
   class Shipment
@@ -39,6 +41,14 @@ module Fedex
     
     def track(options = {})
       Request::Track.new(@credentials, options).process_request
+    end
+    
+    def pickup(options = {})
+      Request::Pickup.new(@credentials, options).process_request
+    end
+    
+    def cancel_pickup(options = {})
+      Request::CancelPickup.new(@credentials, options).process_request
     end
     
     def verify_residential(options = {})
