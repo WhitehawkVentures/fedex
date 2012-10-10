@@ -7,6 +7,7 @@ module Fedex
       
       def initialize(credentials, options={})
         super(credentials, options)
+        @date = options[:date]
       end
       
       # Sends post request to Fedex web service and parse the response
@@ -51,7 +52,7 @@ module Fedex
             }
           }
           xml.PackageLocation "NONE"
-          xml.ReadyTimestamp Time.parse("#{Date.tomorrow.to_s} 10am").xmlschema
+          xml.ReadyTimestamp @date
           xml.CompanyCloseTime "17:00:00"
         }
       end
