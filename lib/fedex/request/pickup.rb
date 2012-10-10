@@ -52,7 +52,7 @@ module Fedex
             }
           }
           xml.PackageLocation "NONE"
-          xml.ReadyTimestamp @date
+          xml.ReadyTimestamp @date.xmlschema
           xml.CompanyCloseTime "17:00:00"
         }
       end
