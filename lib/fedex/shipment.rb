@@ -5,6 +5,7 @@ require 'fedex/request/address_validation'
 require 'fedex/request/track'
 require 'fedex/request/pickup'
 require 'fedex/request/cancel_pickup'
+require 'fedex/request/pickup_availability'
 
 module Fedex
   class Shipment
@@ -49,6 +50,10 @@ module Fedex
     
     def cancel_pickup(options = {})
       Request::CancelPickup.new(@credentials, options).process_request
+    end
+    
+    def get_pickup_availability(options = {})
+      Request::PickupAvailability.new(@credentials, options).process_request
     end
     
     def verify_residential(options = {})
