@@ -44,7 +44,7 @@ module Fedex
         }
         xml.PickupRequestType "FUTURE_DAY"
         xml.DispatchDate @date.to_date.strftime("%F")
-        xml.NumberOfBusinessDays 1
+        # xml.NumberOfBusinessDays 1
         xml.PackageReadyTime @date.strftime("%T")
         xml.CustomerCloseTime "17:00:00"
         xml.Carriers "FDXG"
