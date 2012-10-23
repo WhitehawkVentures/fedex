@@ -8,6 +8,7 @@ module Fedex
       def initialize(credentials, options={})
         super(credentials, options)
         @date = options[:date]
+        @carrier = options[:carrier]
       end
       
       # Sends post request to Fedex web service and parse the response
@@ -47,7 +48,7 @@ module Fedex
         # xml.NumberOfBusinessDays 1
         xml.PackageReadyTime @date.strftime("%T")
         xml.CustomerCloseTime "17:00:00"
-        xml.Carriers "FDXG"
+        xml.Carriers @carrier || "FDXG"
       end
       
       # Build xml Fedex Web Service request

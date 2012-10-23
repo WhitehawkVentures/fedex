@@ -8,6 +8,7 @@ module Fedex
       def initialize(credentials, options={})
         super(credentials, options)
         @date = options[:date]
+        @carrier = options[:carrier]
       end
       
       # Sends post request to Fedex web service and parse the response
@@ -63,7 +64,7 @@ module Fedex
           xml.Units "LB"
           xml.Value @packages.sum{|n| n[:weight][:value]}
         }
-        xml.CarrierCode "FDXG"
+        xml.CarrierCode @carrier || "FDXG"
       end
 
       # Build xml Fedex Web Service request

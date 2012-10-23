@@ -9,6 +9,7 @@ module Fedex
         super(credentials, options)
         @number = options[:number]
         @date = options[:date]
+        @carrier = options[:carrier]
       end
       
       # Sends post request to Fedex web service and parse the response
@@ -40,7 +41,7 @@ module Fedex
             add_web_authentication_detail(xml)
             add_client_detail(xml)
             add_version(xml)
-            xml.CarrierCode "FDXG"
+            xml.CarrierCode @carrier || "FDXG"
             xml.PickupConfirmationNumber @number
             xml.ScheduledDate @date.strftime("%F")
             xml.Remarks "Cancelling..."
