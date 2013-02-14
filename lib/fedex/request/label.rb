@@ -46,6 +46,10 @@ module Fedex
           xml.DropoffType @shipping_options[:drop_off_type] ||= "REGULAR_PICKUP"
           xml.ServiceType service_type
           xml.PackagingType @shipping_options[:packaging_type] ||= "YOUR_PACKAGING"
+          xml.TotalInsuredValue {
+            xml.Currency "USD"
+            xml.Amount @declared_value
+          } if @declared_value
           add_shipper(xml)
           add_recipient(xml)
           add_shipping_charges_payment(xml)

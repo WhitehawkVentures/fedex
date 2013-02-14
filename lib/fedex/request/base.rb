@@ -49,7 +49,7 @@ module Fedex
         @credentials = credentials
         @shipper, @recipient, @packages, @service_type, @customs_clearance, @debug, @label_type, @printed_label_origin = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance], options[:debug], options[:label_type], options[:printed_label_origin]
         @freight_address, @freight_contact = options[:freight_address], options[:freight_contact]
-        @description = options[:description]
+        @description, @declared_value = options[:description], options[:declared_value]
         @shipping_options =  options[:shipping_options] ||={}
       end
 
