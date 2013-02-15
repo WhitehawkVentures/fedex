@@ -8,6 +8,8 @@ module Fedex
       def initialize(credentials, options={})
         super(credentials, options)
         @image = options[:image]
+        @origin = options[:origin]
+        @destination = options[:destination]
       end
       
       # Sends post request to Fedex web service and parse the response
@@ -18,7 +20,7 @@ module Fedex
         response = parse_response(api_response)
         if success?(response)
           puts response.inspect
-          return true
+          return response[:upload_documents_reply]
         else
           puts api_response
           error_message = if response[:upload_documents_reply]
@@ -39,10 +41,12 @@ module Fedex
             add_web_authentication_detail(xml)
             add_client_detail(xml)
             add_version(xml)
+            xml.OriginCountryCode @origin
+            xml.DestinationCountryCode @destination
             xml.Documents {
               xml.DocumentType "COMMERCIAL_INVOICE"
               xml.FileName "ci.pdf"
-              xml.Content @image
+              xml.DocumentContent @image
             }
           }
         end
