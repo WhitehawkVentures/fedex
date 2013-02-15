@@ -6,6 +6,7 @@ require 'fedex/request/track'
 require 'fedex/request/pickup'
 require 'fedex/request/cancel_pickup'
 require 'fedex/request/pickup_availability'
+require 'fedex/request/etd'
 
 module Fedex
   class Shipment
@@ -58,6 +59,10 @@ module Fedex
     
     def verify_residential(options = {})
       Request::AddressValidation.new(@credentials, options).process_request
+    end
+    
+    def upload_document(options = {})
+      Request::EtdUpload.new(@credentials, options).process_request
     end
 
   end

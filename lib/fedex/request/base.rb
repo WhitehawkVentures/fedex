@@ -50,6 +50,7 @@ module Fedex
         @shipper, @recipient, @packages, @service_type, @customs_clearance, @debug, @label_type, @printed_label_origin = options[:shipper], options[:recipient], options[:packages], options[:service_type], options[:customs_clearance], options[:debug], options[:label_type], options[:printed_label_origin]
         @freight_address, @freight_contact = options[:freight_address], options[:freight_contact]
         @description, @declared_value = options[:description], options[:declared_value]
+        @special_services = options[:special_services]
         @shipping_options =  options[:shipping_options] ||={}
       end
 
@@ -267,6 +268,10 @@ module Fedex
         xml.CustomsClearanceDetail{
           customs_to_xml(xml, @customs_clearance)
         }
+      end
+      
+      def add_other(xml, content)
+        customs_to_xml(xml, content)
       end
       
       def add_request_timestamp(xml)
