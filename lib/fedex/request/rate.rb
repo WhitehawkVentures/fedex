@@ -5,6 +5,8 @@ module Fedex
     class Rate < Base
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages)
+        Rails.logger.info(options.inspect)
+        @edt_request_type = options[:edt_request_type]
         super(credentials, options)
       end
       
@@ -42,6 +44,7 @@ module Fedex
           add_customs_clearance(xml) if @customs_clearance
           add_freight_shipment_detail(xml) if @freight_address
           xml.RateRequestTypes "ACCOUNT"
+          xml.EdtRequestType "ALL" if @edt_request_type
           add_packages(xml) unless @freight_address
         }
       end
