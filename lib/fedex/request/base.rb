@@ -280,7 +280,7 @@ module Fedex
 
       # Fedex Web Service Api
       def api_url
-        @credentials.mode == "production" ? PRODUCTION_URL : TEST_URL
+        ["production", "staging"].include?(@credentials.mode) ? PRODUCTION_URL : TEST_URL
       end
 
       # Build xml Fedex Web Service request
