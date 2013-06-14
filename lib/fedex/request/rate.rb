@@ -41,6 +41,7 @@ module Fedex
           add_shipper(xml)
           add_recipient(xml)
           add_shipping_charges_payment(xml)
+          add_other(xml, @special_services) if @special_services
           add_customs_clearance(xml) if @customs_clearance
           add_freight_shipment_detail(xml) if @freight_address
           xml.RateRequestTypes "ACCOUNT"
