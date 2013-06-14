@@ -178,9 +178,14 @@ module Fedex
 
       # Add packages to xml request
       def add_packages(xml)
-        package_count = @packages.size
+        if ["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY"].include?(@service_type)
+          packages = [@packages.first]
+        else
+          packages = @packages
+        end
+        package_count = packages.size
         xml.PackageCount package_count
-        @packages.each do |package|
+        packages.each do |package|
           xml.RequestedPackageLineItems{
             xml.GroupPackageCount 1
             xml.Weight{
@@ -195,7 +200,7 @@ module Fedex
             } if package[:dimensions]
             xml.CustomerReferences {
               xml.CustomerReferenceType "CUSTOMER_REFERENCE"
-              xml.Value package[:shipment_number]
+              xml.Value package[:reference]
             }
           }
         end
@@ -230,31 +235,27 @@ module Fedex
             xml.Units @packages.first[:weight][:units]
             xml.Value @packages.first[:weight][:value]
           }
-          xml.ShipmentDimensions {
-            xml.Length @packages.first[:dimensions][:length].to_i
-            xml.Width @packages.first[:dimensions][:width].to_i
-            xml.Height @packages.first[:dimensions][:height].to_i
-            xml.Units @packages.first[:dimensions][:units]
-          } if @packages.first[:dimensions]
-          xml.LineItems {
-            xml.FreightClass 'CLASS_085'
-            xml.ClassProvidedByCustomer false
-            xml.HandlingUnits 1
-            xml.Packaging 'BOX'
-            xml.Pieces 1
-            xml.PurchaseOrderNumber @packages.first[:shipment_number]
-            xml.Description @description && !@description.blank? ? @description : "Furniture"
-            xml.Weight {
-              xml.Units @packages.first[:weight][:units]
-              xml.Value @packages.first[:weight][:value]
+          @packages.each do |package|
+            xml.LineItems {
+              xml.FreightClass 'CLASS_085'
+              xml.ClassProvidedByCustomer false
+              xml.HandlingUnits 1
+              xml.Packaging 'PALLET'
+              xml.Pieces package[:qty] || 1
+              xml.PurchaseOrderNumber package[:reference]
+              xml.Description package[:description] || "Furniture"
+              xml.Weight {
+                xml.Units package[:weight][:units]
+                xml.Value package[:weight][:value]
+              }
+              xml.Dimensions {
+                xml.Length package[:dimensions][:length].to_i
+                xml.Width package[:dimensions][:width].to_i
+                xml.Height package[:dimensions][:height].to_i
+                xml.Units package[:dimensions][:units]
+              } if package[:dimensions]
             }
-            xml.Dimensions {
-              xml.Length @packages.first[:dimensions][:length].to_i
-              xml.Width @packages.first[:dimensions][:width].to_i
-              xml.Height @packages.first[:dimensions][:height].to_i
-              xml.Units @packages.first[:dimensions][:units]
-            } if @packages.first[:dimensions]
-          }
+          end
         }
       end
       
