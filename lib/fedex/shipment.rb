@@ -1,5 +1,6 @@
 require 'fedex/credentials'
 require 'fedex/request/label'
+require 'fedex/request/delete_shipment'
 require 'fedex/request/rate'
 require 'fedex/request/address_validation'
 require 'fedex/request/track'
@@ -31,6 +32,10 @@ module Fedex
     # @param [String] filename, A location where the label will be saved
     def label(options = {})
       Request::Label.new(@credentials, options).process_request
+    end
+    
+    def delete_shipment(options = {})
+      Request::DeleteShipment.new(@credentials, options).process_request
     end
 
     # @param [Hash] shipper, A hash containing the shipper information
