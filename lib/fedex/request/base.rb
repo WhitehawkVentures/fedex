@@ -178,15 +178,19 @@ module Fedex
 
       # Add packages to xml request
       def add_packages(xml)
+        xml.MasterTrackingId {
+          xml.TrackingNumber @mps_details[:master_tracking_id]
+        } if @mps_details && @mps_details[:master_tracking_id]
         if ["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY"].include?(@service_type)
           packages = [@packages.first]
         else
           packages = @packages
         end
         package_count = packages.size
-        xml.PackageCount package_count
+        xml.PackageCount (@mps_details && @mps_details[:package_count]) || 1
         packages.each do |package|
           xml.RequestedPackageLineItems{
+            xml.SequenceNumber @mps_details[:sequence_number] if @mps_details
             xml.GroupPackageCount 1
             xml.Weight{
               xml.Units package[:weight][:units]
