@@ -7,6 +7,7 @@ module Fedex
     class Label < Base
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages, :service_type)
+        @mps_details = options[:mps_details]
         super(credentials, options)
       end
 
@@ -22,9 +23,28 @@ module Fedex
           Rails.logger.info(response.inspect)
           # create_pdf(label_details)
           if service_type.include?("FREIGHT")
-            { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].first[:parts][:image], :encoded_bol => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].second[:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:master_tracking_id][:tracking_number] }
+            label = { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].first[:parts][:image], :encoded_bol => response[:process_shipment_reply][:completed_shipment_detail][:shipment_documents].second[:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:master_tracking_id][:tracking_number] }
+            begin
+              if response[:process_shipment_reply][:completed_shipment_detail][:shipment_rating] && response[:process_shipment_reply][:completed_shipment_detail][:shipment_rating][:shipment_rate_details]
+                details = response[:process_shipment_reply][:completed_shipment_detail][:shipment_rating][:shipment_rate_details]
+              end
+              label.merge!(:price => (details[:net_charge] || details[:total_net_charge])[:amount].to_f)
+            rescue Exception
+            end
           else
-            { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:label][:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:tracking_ids][:tracking_number] }
+            label = { :encoded_image => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:label][:parts][:image], :tracking_number => response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:tracking_ids][:tracking_number] }
+            begin
+              label.merge!(:master_tracking_id => response[:process_shipment_reply][:completed_shipment_detail][:master_tracking_id][:tracking_number])
+            rescue Exception
+            end
+            begin
+              if response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details] && response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:package_rating]
+                details = response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:package_rating]
+              end
+              label.merge!(:price => (details[:net_charge] || details[:total_net_charge])[:amount].to_f)
+            rescue Exception
+            end
+            return label
           end
         else
           Rails.logger.info(response.inspect)
@@ -82,7 +102,6 @@ module Fedex
           # else
             # add_package_detail(xml)
           # end
-          
         }
       end
 
