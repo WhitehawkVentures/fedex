@@ -47,7 +47,7 @@ module Fedex
       def add_track_request(xml)
         xml.PackageIdentifier {
           xml.Value @tracking_number
-          xml.Type "TRACKING_NUMBER_OR_DOORTAG"
+          xml.Type @tracking_type
         }
         # xml.TrackingNumberUniqueIdentifier @tracking_number
         # xml.ShipDateRangeBegin
