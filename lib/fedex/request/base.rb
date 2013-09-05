@@ -336,10 +336,10 @@ module Fedex
 
       # Use GROUND_HOME_DELIVERY for shipments going to a residential address within the US.
       def service_type
-        if ["HI","AK"].include?(@recipient[:state])
+        if ["HI","AK"].include?(@recipient[:state]) and @recipient[:country_code] =~ /US/i and @shipper[:country_code] =~ /US/i
           "FEDEX_2_DAY"
         else
-          if @recipient[:residential].to_s =~ /true/i and @service_type =~ /GROUND/i and @recipient[:country_code] =~ /US/i
+          if @recipient[:residential].to_s =~ /true/i and @service_type =~ /GROUND/i and @recipient[:country_code] =~ /US/i and @shipper[:country_code] =~ /US/i
             if @packages.first[:weight][:value] < 70
               "GROUND_HOME_DELIVERY"
             else
