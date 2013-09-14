@@ -230,7 +230,7 @@ module Fedex
               xml.CountryCode @freight_address[:country_code]
             }
           }
-          xml.Role "THIRD_PARTY"
+          xml.Role @freight_contact[:role] ? @freight_contact[:role] : "THIRD_PARTY"
           xml.PaymentType "PREPAID"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
