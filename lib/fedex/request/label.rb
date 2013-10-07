@@ -44,8 +44,8 @@ module Fedex
               label.merge!(:price => (details[:net_charge] || details[:total_net_charge])[:amount].to_f)
             rescue Exception
             end
-            return label
           end
+          return label
         else
           Rails.logger.info(response.inspect)
           error_message = if response[:process_shipment_reply]

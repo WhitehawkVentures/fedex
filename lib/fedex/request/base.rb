@@ -230,8 +230,8 @@ module Fedex
               xml.CountryCode @freight_address[:country_code]
             }
           }
-          xml.Role "THIRD_PARTY"
-          xml.PaymentType "PREPAID"
+          xml.Role @recipient[:company] == "TouchOfModern" ? "SHIPPER" : "THIRD_PARTY"
+          xml.PaymentType @recipient[:company] == "TouchOfModern" ? "COLLECT" : "PREPAID"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
           xml.ClientDiscountPercent 0
