@@ -41,7 +41,7 @@ module Fedex
               if response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details] && response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:package_rating]
                 details = response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:package_rating]
               end
-              label.merge!(:price => (details[:net_charge] || details[:total_net_charge])[:amount].to_f)
+              label.merge!(:price => (details[:net_charge] || details[:total_net_charge] || details[:package_rate_details][:net_charge])[:amount].to_f)
             rescue Exception
             end
           end
