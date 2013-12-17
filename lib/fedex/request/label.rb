@@ -40,6 +40,8 @@ module Fedex
             begin
               if response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details] && response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:package_rating]
                 details = response[:process_shipment_reply][:completed_shipment_detail][:completed_package_details][:package_rating]
+              elsif response[:process_shipment_reply][:completed_shipment_detail][:shipment_rating] && response[:process_shipment_reply][:completed_shipment_detail][:shipment_rating][:shipment_rate_details]
+                details = response[:process_shipment_reply][:completed_shipment_detail][:shipment_rating][:shipment_rate_details]
               end
               label.merge!(:price => (details[:net_charge] || details[:total_net_charge] || details[:package_rate_details][:net_charge])[:amount].to_f)
             rescue Exception
