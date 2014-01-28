@@ -192,6 +192,10 @@ module Fedex
           xml.RequestedPackageLineItems{
             xml.SequenceNumber @mps_details[:sequence_number] if @mps_details
             xml.GroupPackageCount 1
+            xml.InsuredValue {
+              xml.Currency "USD"
+              xml.Amount package[:value]
+            } if package[:value]
             xml.Weight{
               xml.Units package[:weight][:units]
               xml.Value package[:weight][:value]
