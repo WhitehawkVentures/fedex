@@ -210,6 +210,7 @@ module Fedex
               xml.CustomerReferenceType "CUSTOMER_REFERENCE"
               xml.Value package[:reference]
             }
+            customs_to_xml(xml, package[:special_services]) if package[:special_services]
           }
         end
       end
