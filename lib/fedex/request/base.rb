@@ -52,6 +52,7 @@ module Fedex
         @description, @declared_value = options[:description], options[:declared_value]
         @special_services = options[:special_services]
         @shipping_options =  options[:shipping_options] ||={}
+        @smart_post_detail = options[:smart_post_detail]
       end
 
       # Sends post request to Fedex web service and parse the response.
@@ -210,7 +211,7 @@ module Fedex
               xml.CustomerReferenceType "CUSTOMER_REFERENCE"
               xml.Value package[:reference]
             }
-            customs_to_xml(xml, package[:special_services]) if package[:special_services]
+            hash_to_xml(xml, package[:special_services]) if package[:special_services]
           }
         end
       end
@@ -278,12 +279,12 @@ module Fedex
       # Add customs clearance(for international shipments)
       def add_customs_clearance(xml)
         xml.CustomsClearanceDetail{
-          customs_to_xml(xml, @customs_clearance)
+          hash_to_xml(xml, @customs_clearance)
         }
       end
       
       def add_other(xml, content)
-        customs_to_xml(xml, content)
+        hash_to_xml(xml, content)
       end
       
       def add_request_timestamp(xml)
@@ -302,17 +303,17 @@ module Fedex
       end
 
       # Build nodes dinamically from the provided customs clearance hash
-      def customs_to_xml(xml, hash)
+      def hash_to_xml(xml, hash)
         hash.each do |key, value|
           if value.is_a?(Hash)
             xml.send "#{camelize(key.to_s)}" do |x|
-              customs_to_xml(x, value)
+              hash_to_xml(x, value)
             end
           elsif value.is_a?(Array)
             node = key
             value.each do |v|
               xml.send "#{camelize(node.to_s)}" do |x|
-                customs_to_xml(x, v)
+                hash_to_xml(x, v)
               end
             end
           else

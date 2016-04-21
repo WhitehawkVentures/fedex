@@ -47,6 +47,13 @@ module Fedex
           xml.RateRequestTypes "ACCOUNT"
           xml.EdtRequestType "ALL" if @edt_request_type
           add_packages(xml) unless @freight_address
+          add_smart_post_detail(xml) if @smart_post_detail
+        }
+      end
+
+      def add_smart_post_detail(xml)
+        xml.SmartPostDetail{
+          hash_to_xml(xml, @smart_post_detail)
         }
       end
 
