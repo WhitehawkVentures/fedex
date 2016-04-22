@@ -43,13 +43,13 @@ module Fedex
           add_shipper(xml)
           add_recipient(xml)
           add_shipping_charges_payment(xml)
+          add_smart_post_detail(xml) if @smart_post_detail
           add_other(xml, @special_services) if @special_services
           add_customs_clearance(xml) if @customs_clearance
           add_freight_shipment_detail(xml) if @freight_address
           xml.RateRequestTypes "NONE"
           xml.EdtRequestType "ALL" if @edt_request_type
           add_packages(xml) unless @freight_address
-          add_smart_post_detail(xml) if @smart_post_detail
         }
       end
 

@@ -197,7 +197,7 @@ module Fedex
             xml.InsuredValue {
               xml.Currency "USD"
               xml.Amount package[:value]
-            } if package[:value] && !["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY"].include?(@service_type)
+            } if package[:value] && !["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY", "SMART_POST"].include?(@service_type)
             xml.Weight{
               xml.Units package[:weight][:units]
               xml.Value package[:weight][:value]
