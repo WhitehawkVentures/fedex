@@ -100,7 +100,7 @@ module Fedex
           add_recipient(xml)
           add_shipping_charges_payment(xml)
           add_customs_clearance(xml) if @customs_clearance
-          xml.RateRequestTypes "ACCOUNT"
+          xml.RateRequestTypes "NONE"
           add_packages(xml)
         }
       end
@@ -171,8 +171,9 @@ module Fedex
         xml.ShippingChargesPayment{
           xml.PaymentType "SENDER"
           xml.Payor{
-            xml.AccountNumber @credentials.account_number
-            xml.CountryCode @shipper[:country_code]
+            xml.ResponsibleParty {
+              xml.AccountNumber @credentials.account_number
+            }
           }
         }
       end
@@ -238,8 +239,7 @@ module Fedex
           }
           # xml.Role @recipient[:company] == "TouchOfModern" ? "SHIPPER" : "THIRD_PARTY"
           # xml.PaymentType @recipient[:company] == "TouchOfModern" ? "COLLECT" : "PREPAID"
-          xml.Role @shipping_options[:role] || (@recipient[:company] == "TouchOfModern" ? "SHIPPER" : "THIRD_PARTY")
-          xml.PaymentType @shipping_options[:payment] || (@recipient[:company] == "TouchOfModern" ? "COLLECT" : "PREPAID")
+          xml.Role @shipping_options[:role] || (@recipient[:company] == "TouchOfModern" ? "SHIPPER" : "CONSIGNEE")
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
           xml.ClientDiscountPercent 0
