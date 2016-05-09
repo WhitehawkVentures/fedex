@@ -15,7 +15,7 @@ module Fedex
       # A Fedex::Label object is created if the response is successful and
       # a PDF file is created with the label at the specified location.
       def process_request
-        puts build_xml
+        puts build_xml if @debug == true
         api_response = self.class.post(api_url, :body => build_xml)
         Rails.logger.info(build_xml)
         puts api_response if @debug == true
