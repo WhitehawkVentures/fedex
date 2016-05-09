@@ -3,7 +3,7 @@ require 'fedex/request/base'
 module Fedex
   module Request
     class Rate < Base
-      # VERSION = 18
+      VERSION = 18
 
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages)
