@@ -42,7 +42,11 @@ module Fedex
           xml.PackagingType @shipping_options[:packaging_type] ||= "YOUR_PACKAGING"
           add_shipper(xml)
           add_recipient(xml)
-          add_shipping_charges_payment(xml)
+          if @freight_address
+            add_freight_shipping_charges_payment(xml) 
+          else
+            add_shipping_charges_payment(xml) 
+          end
           add_smart_post_detail(xml) if @smart_post_detail
           add_other(xml, @special_services) if @special_services
           add_customs_clearance(xml) if @customs_clearance

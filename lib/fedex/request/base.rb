@@ -177,6 +177,32 @@ module Fedex
           }
         }
       end
+      
+      def add_freight_shipping_charges_payment(xml)
+        xml.ShippingChargesPayment{
+          xml.PaymentType "SENDER"
+          xml.Payor{
+            xml.ResponsibleParty {
+              xml.AccountNumber @credentials.freight_account_number
+              xml.Contact{
+                xml.PersonName @freight_contact[:person_name]
+                xml.Title @freight_contact[:title]
+                xml.CompanyName @freight_contact[:company_name]
+                xml.PhoneNumber @freight_contact[:phone_number]
+              }
+              xml.Address {
+                Array(@freight_address[:address]).take(2).each do |address_line|
+                  xml.StreetLines address_line
+                end
+                xml.City @freight_address[:city]
+                xml.StateOrProvinceCode @freight_address[:state]
+                xml.PostalCode @freight_address[:postal_code]
+                xml.CountryCode @freight_address[:country_code]
+              }
+            }
+          }
+        }
+      end
 
       # Add packages to xml request
       def add_packages(xml)
@@ -219,8 +245,8 @@ module Fedex
       
       def add_freight_shipment_detail(xml)
         xml.FreightShipmentDetail {
-          xml.FedExFreightAccountNumber @credentials.freight_account_number
-          xml.FedExFreightBillingContactAndAddress {
+          xml.AlternateBilling {
+            xml.AccountNumber @credentials.freight_account_number
             xml.Contact{
               xml.PersonName @freight_contact[:person_name]
               xml.Title @freight_contact[:title]
@@ -237,9 +263,7 @@ module Fedex
               xml.CountryCode @freight_address[:country_code]
             }
           }
-          # xml.Role @recipient[:company] == "TouchOfModern" ? "SHIPPER" : "THIRD_PARTY"
-          # xml.PaymentType @recipient[:company] == "TouchOfModern" ? "COLLECT" : "PREPAID"
-          xml.Role @shipping_options[:role] || (@recipient[:company] == "TouchOfModern" ? "SHIPPER" : "CONSIGNEE")
+          xml.Role "SHIPPER"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
           xml.ClientDiscountPercent 0
