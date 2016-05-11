@@ -172,33 +172,7 @@ module Fedex
           xml.PaymentType "SENDER"
           xml.Payor{
             xml.ResponsibleParty {
-              xml.AccountNumber @credentials.account_number
-            }
-          }
-        }
-      end
-      
-      def add_freight_shipping_charges_payment(xml)
-        xml.ShippingChargesPayment{
-          xml.PaymentType "SENDER"
-          xml.Payor{
-            xml.ResponsibleParty {
-              xml.AccountNumber @credentials.freight_account_number
-              xml.Contact{
-                xml.PersonName @freight_contact[:person_name]
-                xml.Title @freight_contact[:title]
-                xml.CompanyName @freight_contact[:company_name]
-                xml.PhoneNumber @freight_contact[:phone_number]
-              }
-              xml.Address {
-                Array(@freight_address[:address]).take(2).each do |address_line|
-                  xml.StreetLines address_line
-                end
-                xml.City @freight_address[:city]
-                xml.StateOrProvinceCode @freight_address[:state]
-                xml.PostalCode @freight_address[:postal_code]
-                xml.CountryCode @freight_address[:country_code]
-              }
+              xml.AccountNumber @freight_address ? @credentials.freight_account_number : @credentials.account_number
             }
           }
         }
