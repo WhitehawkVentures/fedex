@@ -394,8 +394,7 @@ module Fedex
       end
       
       def shipping_from_our_warehouse?
-        address = @shipper[:address][0]
-        address == "1202 Chalet Ln" || address == "30063 Ahern Ave"
+        @shipper[:company] == "Touch of Modern" || @shipper[:company] == "TouchOfModern"
       end
 
     end
