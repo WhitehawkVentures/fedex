@@ -325,7 +325,6 @@ module Fedex
       def hash_to_xml(xml, hash)
         hash.each do |key, value|
           if key == :address
-            Rails.logger.info "VALUE!!!!! #{value}"
             xml.Address {
               value[:address][0..1].each do |address_line|
                 xml.StreetLines address_line
@@ -395,7 +394,7 @@ module Fedex
       end
       
       def shipping_from_our_warehouse?
-        address = @freight_address[:address][0]
+        address = @shipper[:address][0]
         address == "1202 Chalet Ln" || address == "30063 Ahern Ave"
       end
 
