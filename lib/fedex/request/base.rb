@@ -303,7 +303,18 @@ module Fedex
       # Build nodes dinamically from the provided customs clearance hash
       def hash_to_xml(xml, hash)
         hash.each do |key, value|
-          if value.is_a?(Hash)
+          if key == :address
+            Rails.logger.info "VALUE!!!!! #{value}"
+            xml.Address {
+              value[:address][0..1].each do |address_line|
+                xml.StreetLines address_line
+              end
+              xml.City value[:city]
+              xml.StateOrProvinceCode value[:state]
+              xml.PostalCode value[:postal_code]
+              xml.CountryCode value[:country_code]
+            }
+          elsif value.is_a?(Hash)
             xml.send "#{camelize(key.to_s)}" do |x|
               hash_to_xml(x, value)
             end
