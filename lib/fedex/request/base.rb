@@ -219,24 +219,45 @@ module Fedex
       
       def add_freight_shipment_detail(xml)
         xml.FreightShipmentDetail {
-          xml.AlternateBilling {
-            xml.AccountNumber @credentials.freight_account_number
-            xml.Contact{
-              xml.PersonName @freight_contact[:person_name]
-              xml.Title @freight_contact[:title]
-              xml.CompanyName @freight_contact[:company_name]
-              xml.PhoneNumber @freight_contact[:phone_number]
+          if shipping_from_our_warehouse?
+            xml.FedExFreightAccountNumber @credentials.freight_account_number
+            xml.FedExFreightBillingContactAndAddress {
+              xml.Contact{
+                xml.PersonName @freight_contact[:person_name]
+                xml.Title @freight_contact[:title]
+                xml.CompanyName @freight_contact[:company_name]
+                xml.PhoneNumber @freight_contact[:phone_number]
+              }
+              xml.Address {
+                Array(@freight_address[:address]).take(2).each do |address_line|
+                  xml.StreetLines address_line
+                end
+                xml.City @freight_address[:city]
+                xml.StateOrProvinceCode @freight_address[:state]
+                xml.PostalCode @freight_address[:postal_code]
+                xml.CountryCode @freight_address[:country_code]
+              }
             }
-            xml.Address {
-              Array(@freight_address[:address]).take(2).each do |address_line|
-                xml.StreetLines address_line
-              end
-              xml.City @freight_address[:city]
-              xml.StateOrProvinceCode @freight_address[:state]
-              xml.PostalCode @freight_address[:postal_code]
-              xml.CountryCode @freight_address[:country_code]
+          else
+            xml.AlternateBilling {
+              xml.AccountNumber @credentials.freight_account_number
+              xml.Contact{
+                xml.PersonName @freight_contact[:person_name]
+                xml.Title @freight_contact[:title]
+                xml.CompanyName @freight_contact[:company_name]
+                xml.PhoneNumber @freight_contact[:phone_number]
+              }
+              xml.Address {
+                Array(@freight_address[:address]).take(2).each do |address_line|
+                  xml.StreetLines address_line
+                end
+                xml.City @freight_address[:city]
+                xml.StateOrProvinceCode @freight_address[:state]
+                xml.PostalCode @freight_address[:postal_code]
+                xml.CountryCode @freight_address[:country_code]
+              }
             }
-          }
+          end
           xml.Role "SHIPPER"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
@@ -371,6 +392,11 @@ module Fedex
       # Successful request
       def success?(response)
         (!response[:rate_reply].nil? and %w{SUCCESS WARNING NOTE}.include? response[:rate_reply][:highest_severity])
+      end
+      
+      def shipping_from_our_warehouse?
+        address = @freight_address[:address][0]
+        address == "1202 Chalet Ln" || address == "30063 Ahern Ave"
       end
 
     end

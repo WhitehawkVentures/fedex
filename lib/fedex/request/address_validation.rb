@@ -16,10 +16,9 @@ module Fedex
         puts api_response if @debug == true
         response = parse_response(api_response)
         if success?(response)
-          # puts response.inspect
           return response[:address_validation_reply][:address_results][:proposed_address_details]
         else
-          puts api_response
+          puts api_response if @debug == true
           error_message = if response[:address_validation_reply]
             [response[:address_validation_reply][:notifications]].flatten.first[:message]
           else

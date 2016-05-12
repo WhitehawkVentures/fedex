@@ -16,10 +16,9 @@ module Fedex
         puts api_response if @debug == true
         response = parse_response(api_response)
         if success?(response)
-          # puts response.inspect
           return response[:track_reply][:track_details]
         else
-          puts api_response
+          puts api_response if @debug == true
           error_message = if response[:track_reply]
             [response[:track_reply][:notifications]].flatten.first[:message]
           else

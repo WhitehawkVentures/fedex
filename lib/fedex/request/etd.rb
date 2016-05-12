@@ -19,10 +19,10 @@ module Fedex
         puts api_response if @debug == true
         response = parse_response(api_response)
         if success?(response)
-          puts response.inspect
+          puts response.inspect if @debug == true
           return response[:upload_documents_reply]
         else
-          puts api_response
+          puts api_response if @debug == true
           error_message = if response[:upload_documents_reply]
             [response[:upload_documents_reply][:notifications]].flatten.first[:message]
           else
