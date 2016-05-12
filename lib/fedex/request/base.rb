@@ -172,7 +172,7 @@ module Fedex
           xml.PaymentType "SENDER"
           xml.Payor{
             xml.ResponsibleParty {
-              xml.AccountNumber @freight_address ? @credentials.freight_account_number : @credentials.account_number
+              xml.AccountNumber service_type.include?("FREIGHT") ? @credentials.freight_account_number : @credentials.account_number
             }
           }
         }
@@ -200,7 +200,7 @@ module Fedex
             } if package[:value] && !["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY", "SMART_POST"].include?(@service_type)
             xml.Weight{
               xml.Units package[:weight][:units]
-              xml.Value package[:weight][:value]
+              xml.Value service_type == "SMART_POST" ? [package[:weight][:value], 1].max : package[:weight][:value]
             }
             xml.Dimensions {
               xml.Length package[:dimensions][:length].to_i
