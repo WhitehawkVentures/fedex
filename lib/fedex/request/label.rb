@@ -5,10 +5,13 @@ require 'fileutils'
 module Fedex
   module Request
     class Label < Base
+      VERSION = 18
+      
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages, :service_type)
         @mps_details = options[:mps_details]
         super(credentials, options)
+        Rails.logger.info(self)
       end
 
       # Sends post request to Fedex web service and parse the response.
@@ -78,6 +81,7 @@ module Fedex
           add_shipper(xml)
           add_recipient(xml)
           add_shipping_charges_payment(xml)
+          add_smart_post_detail(xml) if @smart_post_detail
           add_other(xml, @special_services) if @special_services
           add_customs_clearance(xml) if @customs_clearance
           if service_type.include?("FREIGHT")
@@ -109,11 +113,17 @@ module Fedex
           # end
         }
       end
+      
+      def add_smart_post_detail(xml)
+        xml.SmartPostDetail{
+          hash_to_xml(xml, @smart_post_detail)
+        }
+      end
 
       # Build xml Fedex Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
-          xml.ProcessShipmentRequest(:xmlns => "http://fedex.com/ws/ship/v10"){
+          xml.ProcessShipmentRequest(:xmlns => "http://fedex.com/ws/ship/v#{VERSION}"){
             add_web_authentication_detail(xml)
             add_client_detail(xml)
             add_version(xml)

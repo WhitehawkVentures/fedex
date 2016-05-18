@@ -18,10 +18,10 @@ module Fedex
         puts api_response if @debug == true
         response = parse_response(api_response)
         if success?(response)
-          puts response.inspect
+          puts response.inspect if @debug == true
           return response[:create_pickup_reply][:pickup_confirmation_number]
         else
-          puts api_response
+          puts api_response if @debug == true
           error_message = if response[:create_pickup_reply]
             [response[:create_pickup_reply][:notifications]].flatten.first[:message]
           else

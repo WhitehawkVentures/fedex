@@ -100,7 +100,7 @@ module Fedex
           add_recipient(xml)
           add_shipping_charges_payment(xml)
           add_customs_clearance(xml) if @customs_clearance
-          xml.RateRequestTypes "ACCOUNT"
+          xml.RateRequestTypes "NONE"
           add_packages(xml)
         }
       end
@@ -171,8 +171,9 @@ module Fedex
         xml.ShippingChargesPayment{
           xml.PaymentType "SENDER"
           xml.Payor{
-            xml.AccountNumber @credentials.account_number
-            xml.CountryCode @shipper[:country_code]
+            xml.ResponsibleParty {
+              xml.AccountNumber service_type.include?("FREIGHT") ? @credentials.freight_account_number : @credentials.account_number
+            }
           }
         }
       end
@@ -196,10 +197,10 @@ module Fedex
             xml.InsuredValue {
               xml.Currency "USD"
               xml.Amount package[:value]
-            } if package[:value] && !["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY"].include?(@service_type)
+            } if package[:value] && !["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY", "SMART_POST"].include?(@service_type)
             xml.Weight{
               xml.Units package[:weight][:units]
-              xml.Value package[:weight][:value]
+              xml.Value service_type == "SMART_POST" ? [package[:weight][:value], 1].max : package[:weight][:value]
             }
             xml.Dimensions {
               xml.Length package[:dimensions][:length].to_i
@@ -218,28 +219,46 @@ module Fedex
       
       def add_freight_shipment_detail(xml)
         xml.FreightShipmentDetail {
-          xml.FedExFreightAccountNumber @credentials.freight_account_number
-          xml.FedExFreightBillingContactAndAddress {
-            xml.Contact{
-              xml.PersonName @freight_contact[:person_name]
-              xml.Title @freight_contact[:title]
-              xml.CompanyName @freight_contact[:company_name]
-              xml.PhoneNumber @freight_contact[:phone_number]
+          if shipping_from_our_warehouse?
+            xml.FedExFreightAccountNumber @credentials.freight_account_number
+            xml.FedExFreightBillingContactAndAddress {
+              xml.Contact{
+                xml.PersonName @freight_contact[:person_name]
+                xml.Title @freight_contact[:title]
+                xml.CompanyName @freight_contact[:company_name]
+                xml.PhoneNumber @freight_contact[:phone_number]
+              }
+              xml.Address {
+                Array(@freight_address[:address]).take(2).each do |address_line|
+                  xml.StreetLines address_line
+                end
+                xml.City @freight_address[:city]
+                xml.StateOrProvinceCode @freight_address[:state]
+                xml.PostalCode @freight_address[:postal_code]
+                xml.CountryCode @freight_address[:country_code]
+              }
             }
-            xml.Address {
-              Array(@freight_address[:address]).take(2).each do |address_line|
-                xml.StreetLines address_line
-              end
-              xml.City @freight_address[:city]
-              xml.StateOrProvinceCode @freight_address[:state]
-              xml.PostalCode @freight_address[:postal_code]
-              xml.CountryCode @freight_address[:country_code]
+          else
+            xml.AlternateBilling {
+              xml.AccountNumber @credentials.freight_account_number
+              xml.Contact{
+                xml.PersonName @freight_contact[:person_name]
+                xml.Title @freight_contact[:title]
+                xml.CompanyName @freight_contact[:company_name]
+                xml.PhoneNumber @freight_contact[:phone_number]
+              }
+              xml.Address {
+                Array(@freight_address[:address]).take(2).each do |address_line|
+                  xml.StreetLines address_line
+                end
+                xml.City @freight_address[:city]
+                xml.StateOrProvinceCode @freight_address[:state]
+                xml.PostalCode @freight_address[:postal_code]
+                xml.CountryCode @freight_address[:country_code]
+              }
             }
-          }
-          # xml.Role @recipient[:company] == "TouchOfModern" ? "SHIPPER" : "THIRD_PARTY"
-          # xml.PaymentType @recipient[:company] == "TouchOfModern" ? "COLLECT" : "PREPAID"
-          xml.Role @shipping_options[:role] || (@recipient[:company] == "TouchOfModern" ? "SHIPPER" : "THIRD_PARTY")
-          xml.PaymentType @shipping_options[:payment] || (@recipient[:company] == "TouchOfModern" ? "COLLECT" : "PREPAID")
+          end
+          xml.Role "SHIPPER"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits 1
           xml.ClientDiscountPercent 0
@@ -305,7 +324,17 @@ module Fedex
       # Build nodes dinamically from the provided customs clearance hash
       def hash_to_xml(xml, hash)
         hash.each do |key, value|
-          if value.is_a?(Hash)
+          if key == :address
+            xml.Address {
+              value[:address][0..1].each do |address_line|
+                xml.StreetLines address_line
+              end
+              xml.City value[:city]
+              xml.StateOrProvinceCode value[:state]
+              xml.PostalCode value[:postal_code]
+              xml.CountryCode value[:country_code]
+            }
+          elsif value.is_a?(Hash)
             xml.send "#{camelize(key.to_s)}" do |x|
               hash_to_xml(x, value)
             end
@@ -362,6 +391,10 @@ module Fedex
       # Successful request
       def success?(response)
         (!response[:rate_reply].nil? and %w{SUCCESS WARNING NOTE}.include? response[:rate_reply][:highest_severity])
+      end
+      
+      def shipping_from_our_warehouse?
+        @shipper[:company] == "Touch of Modern" || @shipper[:company] == "TouchOfModern"
       end
 
     end

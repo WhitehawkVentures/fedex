@@ -3,6 +3,8 @@ require 'fedex/request/base'
 module Fedex
   module Request
     class Rate < Base
+      VERSION = 18
+
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages)
         Rails.logger.info(options.inspect)
@@ -40,14 +42,14 @@ module Fedex
           xml.PackagingType @shipping_options[:packaging_type] ||= "YOUR_PACKAGING"
           add_shipper(xml)
           add_recipient(xml)
-          add_shipping_charges_payment(xml)
+          add_shipping_charges_payment(xml) 
+          add_smart_post_detail(xml) if @smart_post_detail
           add_other(xml, @special_services) if @special_services
           add_customs_clearance(xml) if @customs_clearance
           add_freight_shipment_detail(xml) if @freight_address
-          xml.RateRequestTypes "ACCOUNT"
+          xml.RateRequestTypes "NONE"
           xml.EdtRequestType "ALL" if @edt_request_type
           add_packages(xml) unless @freight_address
-          add_smart_post_detail(xml) if @smart_post_detail
         }
       end
 
@@ -60,7 +62,7 @@ module Fedex
       # Build xml Fedex Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
-          xml.RateRequest(:xmlns => "http://fedex.com/ws/rate/v10"){
+          xml.RateRequest(:xmlns => "http://fedex.com/ws/rate/v#{VERSION}"){
             add_web_authentication_detail(xml)
             add_client_detail(xml)
             add_version(xml)
