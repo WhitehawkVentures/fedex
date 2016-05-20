@@ -172,7 +172,7 @@ module Fedex
           xml.PaymentType "SENDER"
           xml.Payor{
             xml.ResponsibleParty {
-              xml.AccountNumber service_type.include?("FREIGHT") ? @credentials.freight_account_number : @credentials.account_number
+              xml.AccountNumber service_type && service_type.include?("FREIGHT") ? @credentials.freight_account_number : @credentials.account_number
             }
           }
         }
