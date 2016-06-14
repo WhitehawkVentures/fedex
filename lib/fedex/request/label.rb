@@ -5,7 +5,7 @@ require 'fileutils'
 module Fedex
   module Request
     class Label < Base
-      VERSION = 18
+      VERSION = 17
       
       def initialize(credentials, options={})
         requires!(options, :shipper, :recipient, :packages, :service_type)
