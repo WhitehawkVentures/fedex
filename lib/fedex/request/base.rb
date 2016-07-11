@@ -200,7 +200,7 @@ module Fedex
             } if package[:value] && !["FEDEX_FREIGHT_ECONOMY", "FEDEX_FREIGHT_PRIORITY", "SMART_POST"].include?(@service_type)
             xml.Weight{
               xml.Units package[:weight][:units]
-              xml.Value service_type == "SMART_POST" ? [package[:weight][:value], 1].max : package[:weight][:value]
+              xml.Value package[:weight][:value]
             }
             xml.Dimensions {
               xml.Length package[:dimensions][:length].to_i
