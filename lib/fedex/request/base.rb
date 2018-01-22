@@ -260,17 +260,17 @@ module Fedex
           end
           xml.Role "SHIPPER"
           xml.CollectTermsType "STANDARD"
-          xml.TotalHandlingUnits 1
+          xml.TotalHandlingUnits @packages.reduce { |sum, package| sum + package[:pallet_qty] } || 1
           xml.ClientDiscountPercent 0
           xml.PalletWeight {
             xml.Units @packages.first[:weight][:units]
-            xml.Value @packages.first[:weight][:value]
+            xml.Value @packages.reduce { |sum, package| sum + package[:weight][:value] }
           }
           @packages.each do |package|
             xml.LineItems {
               xml.FreightClass 'CLASS_085'
               xml.ClassProvidedByCustomer false
-              xml.HandlingUnits 1
+              xml.HandlingUnits package[:pallet_qty] || 1
               xml.Packaging 'PALLET'
               xml.Pieces package[:qty] || 1
               xml.PurchaseOrderNumber package[:reference]
