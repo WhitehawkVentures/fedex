@@ -258,7 +258,7 @@ module Fedex
             #     xml.CountryCode @freight_address[:country_code]
             #   }
             # }
-          end
+          # end
           xml.Role @shipping_options[:role] || "SHIPPER"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits @packages.reduce(0) { |sum, package| sum + (package[:pallet_qty] || 1) } || 1
