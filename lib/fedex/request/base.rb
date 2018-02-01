@@ -258,7 +258,7 @@ module Fedex
               }
             }
           end
-          xml.Role "SHIPPER"
+          xml.Role "CONSIGNEE"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits @packages.reduce(0) { |sum, package| sum + (package[:pallet_qty] || 1) } || 1
           xml.ClientDiscountPercent 0
