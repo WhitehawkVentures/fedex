@@ -51,7 +51,8 @@ module Fedex
         @freight_address, @freight_contact = options[:freight_address], options[:freight_contact]
         @description, @declared_value = options[:description], options[:declared_value]
         @special_services = options[:special_services]
-        @shipping_options =  options[:shipping_options] ||={}
+        @payment_options = options[:payment_options] ||= {}
+        @shipping_options =  options[:shipping_options] ||= {}
         @smart_post_detail = options[:smart_post_detail]
       end
 
@@ -169,7 +170,7 @@ module Fedex
       # Add shipping charges to xml request
       def add_shipping_charges_payment(xml)
         xml.ShippingChargesPayment{
-          xml.PaymentType "SENDER"
+          xml.PaymentType @payment_options[:type] || "SENDER"
           xml.Payor{
             xml.ResponsibleParty {
               xml.AccountNumber service_type && service_type.include?("FREIGHT") ? @credentials.freight_account_number : @credentials.account_number
@@ -258,7 +259,7 @@ module Fedex
               }
             }
           end
-          xml.Role "CONSIGNEE"
+          xml.Role @shipping_options[:role] || "SHIPPER"
           xml.CollectTermsType "STANDARD"
           xml.TotalHandlingUnits @packages.reduce(0) { |sum, package| sum + (package[:pallet_qty] || 1) } || 1
           xml.ClientDiscountPercent 0
