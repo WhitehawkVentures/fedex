@@ -220,7 +220,7 @@ module Fedex
       
       def add_freight_shipment_detail(xml)
         xml.FreightShipmentDetail {
-          if shipping_from_our_warehouse?
+          # if shipping_from_our_warehouse?
             xml.FedExFreightAccountNumber @credentials.freight_account_number
             xml.FedExFreightBillingContactAndAddress {
               xml.Contact{
@@ -239,7 +239,7 @@ module Fedex
                 xml.CountryCode @freight_address[:country_code]
               }
             }
-          else
+          # else
             # xml.AlternateBilling {
             #   xml.AccountNumber @credentials.freight_account_number
             #   xml.Contact{
