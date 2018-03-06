@@ -342,7 +342,11 @@ module Fedex
             node = key
             value.each do |v|
               xml.send "#{camelize(node.to_s)}" do |x|
-                hash_to_xml(x, v)
+                if v.is_a?(Hash)
+                  hash_to_xml(x, v)
+                else
+                  v
+                end
               end
             end
           else
