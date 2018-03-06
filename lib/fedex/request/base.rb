@@ -341,12 +341,12 @@ module Fedex
           elsif value.is_a?(Array)
             node = key
             value.each do |v|
-              xml.send "#{camelize(node.to_s)}" do |x|
-                if v.is_a?(Hash)
+              if v.is_a?(Hash)
+                xml.send "#{camelize(node.to_s)}" do |x|
                   hash_to_xml(x, v)
-                else
-                  v
                 end
+              else
+                xml.send(camelize(node.to_s), v)
               end
             end
           else
