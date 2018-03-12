@@ -155,8 +155,16 @@ module Fedex
             xml.PhoneNumber @recipient[:phone_number]
           }
           xml.Address {
-            Array(@recipient[:address]).take(2).each do |address_line|
-              xml.StreetLines address_line
+            if @recipient[:address]
+              Array(@recipient[:address]).take(2).each do |address_line|
+                xml.StreetLines address_line
+              end
+            elsif @recipient[:address1]
+              xml.StreetLines @recipient[:address1]
+              xml.StreetLines @recipient[:address2] if @recipient[:address2]
+            elsif @recipient[:street1]
+              xml.StreetLines @recipient[:street1]
+              xml.StreetLines @recipient[:street2] if @recipient[:street2]
             end
             xml.City @recipient[:city]
             xml.StateOrProvinceCode @recipient[:state]
