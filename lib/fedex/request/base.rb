@@ -51,7 +51,8 @@ module Fedex
         @freight_address, @freight_contact = options[:freight_address], options[:freight_contact]
         @description, @declared_value = options[:description], options[:declared_value]
         @special_services = options[:special_services]
-        @shipping_options =  options[:shipping_options] ||={}
+        @payment_options = options[:payment_options] ||= {}
+        @shipping_options =  options[:shipping_options] ||= {}
         @smart_post_detail = options[:smart_post_detail]
       end
 
@@ -154,8 +155,16 @@ module Fedex
             xml.PhoneNumber @recipient[:phone_number]
           }
           xml.Address {
-            Array(@recipient[:address]).take(2).each do |address_line|
-              xml.StreetLines address_line
+            if @recipient[:address]
+              Array(@recipient[:address]).take(2).each do |address_line|
+                xml.StreetLines address_line
+              end
+            elsif @recipient[:address1]
+              xml.StreetLines(@recipient[:address1])
+              xml.StreetLines(@recipient[:address2]) if @recipient[:address2]
+            elsif @recipient[:street1]
+              xml.StreetLines(@recipient[:street1])
+              xml.StreetLines(@recipient[:street2]) if @recipient[:street2]
             end
             xml.City @recipient[:city]
             xml.StateOrProvinceCode @recipient[:state]
@@ -169,7 +178,7 @@ module Fedex
       # Add shipping charges to xml request
       def add_shipping_charges_payment(xml)
         xml.ShippingChargesPayment{
-          xml.PaymentType "SENDER"
+          xml.PaymentType @payment_options[:type] || "SENDER"
           xml.Payor{
             xml.ResponsibleParty {
               xml.AccountNumber service_type && service_type.include?("FREIGHT") ? @credentials.freight_account_number : @credentials.account_number
@@ -219,58 +228,37 @@ module Fedex
       
       def add_freight_shipment_detail(xml)
         xml.FreightShipmentDetail {
-          if shipping_from_our_warehouse?
-            xml.FedExFreightAccountNumber @credentials.freight_account_number
-            xml.FedExFreightBillingContactAndAddress {
-              xml.Contact{
-                xml.PersonName @freight_contact[:person_name]
-                xml.Title @freight_contact[:title]
-                xml.CompanyName @freight_contact[:company_name]
-                xml.PhoneNumber @freight_contact[:phone_number]
-              }
-              xml.Address {
-                Array(@freight_address[:address]).take(2).each do |address_line|
-                  xml.StreetLines address_line
-                end
-                xml.City @freight_address[:city]
-                xml.StateOrProvinceCode @freight_address[:state]
-                xml.PostalCode @freight_address[:postal_code]
-                xml.CountryCode @freight_address[:country_code]
-              }
+          xml.FedExFreightAccountNumber @credentials.freight_account_number
+          xml.FedExFreightBillingContactAndAddress {
+            xml.Contact{
+              xml.PersonName @freight_contact[:person_name]
+              xml.Title @freight_contact[:title]
+              xml.CompanyName @freight_contact[:company_name]
+              xml.PhoneNumber @freight_contact[:phone_number]
             }
-          else
-            xml.AlternateBilling {
-              xml.AccountNumber @credentials.freight_account_number
-              xml.Contact{
-                xml.PersonName @freight_contact[:person_name]
-                xml.Title @freight_contact[:title]
-                xml.CompanyName @freight_contact[:company_name]
-                xml.PhoneNumber @freight_contact[:phone_number]
-              }
-              xml.Address {
-                Array(@freight_address[:address]).take(2).each do |address_line|
-                  xml.StreetLines address_line
-                end
-                xml.City @freight_address[:city]
-                xml.StateOrProvinceCode @freight_address[:state]
-                xml.PostalCode @freight_address[:postal_code]
-                xml.CountryCode @freight_address[:country_code]
-              }
+            xml.Address {
+              Array(@freight_address[:address]).take(2).each do |address_line|
+                xml.StreetLines address_line
+              end
+              xml.City @freight_address[:city]
+              xml.StateOrProvinceCode @freight_address[:state]
+              xml.PostalCode @freight_address[:postal_code]
+              xml.CountryCode @freight_address[:country_code]
             }
-          end
-          xml.Role "SHIPPER"
+          }
+          xml.Role @shipping_options[:role] || "SHIPPER"
           xml.CollectTermsType "STANDARD"
-          xml.TotalHandlingUnits 1
+          xml.TotalHandlingUnits @packages.reduce(0) { |sum, package| sum + (package[:pallet_qty] || 1) } || 1
           xml.ClientDiscountPercent 0
           xml.PalletWeight {
             xml.Units @packages.first[:weight][:units]
-            xml.Value @packages.first[:weight][:value]
+            xml.Value @packages.reduce(0) { |sum, package| sum + package[:weight][:value] }
           }
           @packages.each do |package|
             xml.LineItems {
               xml.FreightClass 'CLASS_085'
               xml.ClassProvidedByCustomer false
-              xml.HandlingUnits 1
+              xml.HandlingUnits package[:pallet_qty] || 1
               xml.Packaging 'PALLET'
               xml.Pieces package[:qty] || 1
               xml.PurchaseOrderNumber package[:reference]
