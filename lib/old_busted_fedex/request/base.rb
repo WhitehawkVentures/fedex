@@ -1,23 +1,23 @@
 require 'httparty'
 require 'nokogiri'
-require 'fedex/helpers'
-require 'fedex/rate'
+require 'old_busted_fedex/helpers'
+require 'old_busted_fedex/rate'
 
-module Fedex
+module OldBustedFedex
   module Request
     class Base
       include Helpers
       include HTTParty
       format :xml
-      # If true the rate method will return the complete response from the Fedex Web Service
+      # If true the rate method will return the complete response from the OldBustedFedex Web Service
       attr_accessor :debug
-      # Fedex Text URL
+      # OldBustedFedex Text URL
       TEST_URL = "https://gatewaybeta.fedex.com:443/xml/"
 
-      # Fedex Production URL
+      # OldBustedFedex Production URL
       PRODUCTION_URL = "https://gateway.fedex.com:443/xml/"
 
-      # Fedex Version number for the Fedex service used
+      # OldBustedFedex Version number for the OldBustedFedex service used
       VERSION = 10
 
       # List of available Service Types
@@ -35,15 +35,15 @@ module Fedex
       # Recipient Custom ID Type
       RECIPIENT_CUSTOM_ID_TYPE = %w(COMPANY INDIVIDUAL PASSPORT)
 
-      # In order to use Fedex rates API you must first apply for a developer(and later production keys),
-      # Visit {http://www.fedex.com/us/developer/ Fedex Developer Center} for more information about how to obtain your keys.
-      # @param [String] key - Fedex web service key
-      # @param [String] password - Fedex password
-      # @param [String] account_number - Fedex account_number
-      # @param [String] meter - Fedex meter number
+      # In order to use OldBustedFedex rates API you must first apply for a developer(and later production keys),
+      # Visit {http://www.old_busted_fedex.com/us/developer/ OldBustedFedex Developer Center} for more information about how to obtain your keys.
+      # @param [String] key - OldBustedFedex web service key
+      # @param [String] password - OldBustedFedex password
+      # @param [String] account_number - OldBustedFedex account_number
+      # @param [String] meter - OldBustedFedex meter number
       # @param [String] mode - [development/production]
       #
-      # return a Fedex::Request::Base object
+      # return a OldBustedFedex::Request::Base object
       def initialize(credentials, options={})
         # requires!(options, :shipper, :recipient, :packages, :service_type)
         @credentials = credentials
@@ -56,7 +56,7 @@ module Fedex
         @smart_post_detail = options[:smart_post_detail]
       end
 
-      # Sends post request to Fedex web service and parse the response.
+      # Sends post request to OldBustedFedex web service and parse the response.
       # Implemented by each subclass
       def process_request
         raise NotImplementedError, "Override process_request in subclass"
@@ -298,12 +298,12 @@ module Fedex
         xml.RequestTimestamp Time.now.xmlschema
       end
 
-      # Fedex Web Service Api
+      # OldBustedFedex Web Service Api
       def api_url
         ["production", "staging"].include?(@credentials.mode) ? PRODUCTION_URL : TEST_URL
       end
 
-      # Build xml Fedex Web Service request
+      # Build xml OldBustedFedex Web Service request
       # Implemented by each subclass
       def build_xml
         raise NotImplementedError, "Override build_xml in subclass"

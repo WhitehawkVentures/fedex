@@ -1,6 +1,6 @@
-require 'fedex/request/base'
+require 'old_busted_fedex/request/base'
 
-module Fedex
+module OldBustedFedex
   module Request
     class Rate < Base
       VERSION = 18
@@ -12,7 +12,7 @@ module Fedex
         super(credentials, options)
       end
       
-      # Sends post request to Fedex web service and parse the response, a Rate object is created if the response is successful
+      # Sends post request to OldBustedFedex web service and parse the response, a Rate object is created if the response is successful
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
         Rails.logger.info(build_xml)
@@ -20,7 +20,7 @@ module Fedex
         response = parse_response(api_response)
         if success?(response)
           rate_details = response[:rate_reply][:rate_reply_details]
-          # Fedex::Rate.new(rate_details)
+          # OldBustedFedex::Rate.new(rate_details)
         else
           error_message = if response[:rate_reply]
             [response[:rate_reply][:notifications]].flatten.first[:message]
@@ -59,7 +59,7 @@ module Fedex
         }
       end
 
-      # Build xml Fedex Web Service request
+      # Build xml OldBustedFedex Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
           xml.RateRequest(:xmlns => "http://fedex.com/ws/rate/v#{VERSION}"){

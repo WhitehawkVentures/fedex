@@ -1,8 +1,8 @@
-require 'fedex/request/base'
-require 'fedex/label'
+require 'old_busted_fedex/request/base'
+require 'old_busted_fedex/label'
 require 'fileutils'
 
-module Fedex
+module OldBustedFedex
   module Request
     class Label < Base
       VERSION = 17
@@ -14,8 +14,8 @@ module Fedex
         Rails.logger.info(self)
       end
 
-      # Sends post request to Fedex web service and parse the response.
-      # A Fedex::Label object is created if the response is successful and
+      # Sends post request to OldBustedFedex web service and parse the response.
+      # A OldBustedFedex::Label object is created if the response is successful and
       # a PDF file is created with the label at the specified location.
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
@@ -120,7 +120,7 @@ module Fedex
         }
       end
 
-      # Build xml Fedex Web Service request
+      # Build xml OldBustedFedex Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
           xml.ProcessShipmentRequest(:xmlns => "http://fedex.com/ws/ship/v#{VERSION}"){

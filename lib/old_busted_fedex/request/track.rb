@@ -1,6 +1,6 @@
-require 'fedex/request/base'
+require 'old_busted_fedex/request/base'
 
-module Fedex
+module OldBustedFedex
   module Request
     class Track < Base
       VERSION = 5
@@ -10,7 +10,7 @@ module Fedex
         @tracking_number, @tracking_type = options[:tracking_number], (options[:tracking_type] || "TRACKING_NUMBER_OR_DOORTAG")
       end
       
-      # Sends post request to Fedex web service and parse the response
+      # Sends post request to OldBustedFedex web service and parse the response
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
         puts api_response if @debug == true
@@ -58,7 +58,7 @@ module Fedex
         # xml.PagingToken
       end
 
-      # Build xml Fedex Web Service request
+      # Build xml OldBustedFedex Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
           xml.TrackRequest(:xmlns => "http://fedex.com/ws/track/v5"){

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module Fedex
+module OldBustedFedex
   describe Label do
     describe "ship service for label" do
       let(:fedex) { Shipment.new(fedex_credentials) }

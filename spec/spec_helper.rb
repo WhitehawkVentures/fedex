@@ -1,5 +1,5 @@
 require 'rspec'
-require 'fedex'
+require 'old_busted_fedex'
 require 'support/vcr'
 
 def fedex_credentials

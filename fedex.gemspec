@@ -1,18 +1,18 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "fedex/version"
+require "old_busted_fedex/version"
 
 Gem::Specification.new do |s|
-  s.name        = "fedex"
-  s.version     = Fedex::VERSION
+  s.name        = "old_busted_fedex"
+  s.version     = OldBustedFedex::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Jazmin Schroeder"]
   s.email       = ["jazminschroeder@gmail.com"]
-  s.homepage    = "https://github.com/jazminschroeder/fedex"
-  s.summary     = %q{Fedex Rate Webservice}
-  s.description = %q{Ruby Library to use Fedex Web Services(version 10)}
+  s.homepage    = "https://github.com/WhitehawkVentures/fedex"
+  s.summary     = %q{Old Busted Fedex Rate Webservice}
+  s.description = %q{Old Busted Ruby Library to use Fedex Web Services(version 10)}
 
-  s.rubyforge_project = "fedex"
+  s.rubyforge_project = "old_busted_fedex"
 
   s.add_dependency 'httparty',            '~> 0.11.0'
   s.add_dependency 'nokogiri',            '~> 1.6'

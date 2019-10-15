@@ -1,4 +1,4 @@
-module Fedex
+module OldBustedFedex
   module Helpers
 
     private

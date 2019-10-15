@@ -1,8 +1,8 @@
-module Fedex
+module OldBustedFedex
   class Label
     attr_accessor :options
 
-    # Initialize Fedex::Label Object
+    # Initialize OldBustedFedex::Label Object
     # @param [Hash] options
     def initialize(options = {})
       @options = options
