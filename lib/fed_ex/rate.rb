@@ -1,14 +1,14 @@
-module OldBustedFedex
-  # Visit {http://www.fedex.com/us/developer/ OldBustedFedex Developer Center} for a complete list of values returned from the API
+module FedEx
+  # Visit {http://www.fedex.com/us/developer/ FedEx Developer Center} for a complete list of values returned from the API
   #
   # Rate totals are contained in the node
   #    response[:rate_reply][:rate_reply_details][:rated_shipment_details]
   class Rate
-    # Initialize OldBustedFedex::Rate Object
+    # Initialize FedEx::Rate Object
     # @param [Hash] options
     #
     #
-    # return [OldBustedFedex::Rate Object]
+    # return [FedEx::Rate Object]
     #     @rate_type #Type used for this specific set of rate data
     #     @rate_zone #Indicates the rate zone used(based on origin and destination)
     #     @total_billing_weight #The weight used to calculate these rates
@@ -29,7 +29,7 @@ module OldBustedFedex
       @total_net_freight = options[:total_net_freight][:amount]
       @total_surcharges = options[:total_surcharges][:amount]
       @total_base_charge = options[:total_base_charge][:amount]
-      @total_net_old_busted_fedex_charge = (options[:total_net_fe_dex_charge]||{})[:amount]
+      @total_net_fed_ex_charge = (options[:total_net_fe_dex_charge]||{})[:amount]
       @total_rebates = (options[:total_rebates]||{})[:amount]
     end
   end

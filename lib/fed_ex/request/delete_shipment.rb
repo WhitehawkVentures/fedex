@@ -1,6 +1,6 @@
-require 'old_busted_fedex/request/base'
+require 'fed_ex/request/base'
 
-module OldBustedFedex
+module FedEx
   module Request
     class DeleteShipment < Base
       VERSION = 10
@@ -10,7 +10,7 @@ module OldBustedFedex
         @tracking_number = options[:tracking_number]
       end
       
-      # Sends post request to OldBustedFedex web service and parse the response
+      # Sends post request to FedEx web service and parse the response
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
         Rails.logger.info(build_xml)
@@ -32,7 +32,7 @@ module OldBustedFedex
 
       private
       
-      # Build xml OldBustedFedex Web Service request
+      # Build xml FedEx Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
           xml.DeleteShipmentRequest(:xmlns => "http://fedex.com/ws/ship/v10"){

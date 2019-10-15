@@ -1,26 +1,26 @@
-require 'old_busted_fedex/credentials'
-require 'old_busted_fedex/request/label'
-require 'old_busted_fedex/request/delete_shipment'
-require 'old_busted_fedex/request/rate'
-require 'old_busted_fedex/request/address_validation'
-require 'old_busted_fedex/request/track'
-require 'old_busted_fedex/request/pickup'
-require 'old_busted_fedex/request/cancel_pickup'
-require 'old_busted_fedex/request/pickup_availability'
-require 'old_busted_fedex/request/etd'
+require 'fed_ex/credentials'
+require 'fed_ex/request/label'
+require 'fed_ex/request/delete_shipment'
+require 'fed_ex/request/rate'
+require 'fed_ex/request/address_validation'
+require 'fed_ex/request/track'
+require 'fed_ex/request/pickup'
+require 'fed_ex/request/cancel_pickup'
+require 'fed_ex/request/pickup_availability'
+require 'fed_ex/request/etd'
 
-module OldBustedFedex
+module FedEx
   class Shipment
 
-    # In order to use OldBustedFedex rates API you must first apply for a developer(and later production keys),
-    # Visit {http://www.old_busted_fedex.com/us/developer/ OldBustedFedex Developer Center} for more information about how to obtain your keys.
-    # @param [String] key - OldBustedFedex web service key
-    # @param [String] password - OldBustedFedex password
-    # @param [String] account_number - OldBustedFedex account_number
-    # @param [String] meter - OldBustedFedex meter number
+    # In order to use FedEx rates API you must first apply for a developer(and later production keys),
+    # Visit {http://www.fed_ex.com/us/developer/ FedEx Developer Center} for more information about how to obtain your keys.
+    # @param [String] key - FedEx web service key
+    # @param [String] password - FedEx password
+    # @param [String] account_number - FedEx account_number
+    # @param [String] meter - FedEx meter number
     # @param [String] mode - [development/production]
     #
-    # return a OldBustedFedex::Shipment object
+    # return a FedEx::Shipment object
     def initialize(options={})
       @credentials = Credentials.new(options)
     end
@@ -28,7 +28,7 @@ module OldBustedFedex
     # @param [Hash] shipper, A hash containing the shipper information
     # @param [Hash] recipient, A hash containing the recipient information
     # @param [Array] packages, An arrary including a hash for each package being shipped
-    # @param [String] service_type, A valid old_busted_fedex service type, to view a complete list of services OldBustedFedex::Shipment::SERVICE_TYPES
+    # @param [String] service_type, A valid fed_ex service type, to view a complete list of services FedEx::Shipment::SERVICE_TYPES
     # @param [String] filename, A location where the label will be saved
     def label(options = {})
       Request::Label.new(@credentials, options).process_request
@@ -41,7 +41,7 @@ module OldBustedFedex
     # @param [Hash] shipper, A hash containing the shipper information
     # @param [Hash] recipient, A hash containing the recipient information
     # @param [Array] packages, An arrary including a hash for each package being shipped
-    # @param [String] service_type, A valid old_busted_fedex service type, to view a complete list of services OldBustedFedex::Shipment::SERVICE_TYPES
+    # @param [String] service_type, A valid fed_ex service type, to view a complete list of services FedEx::Shipment::SERVICE_TYPES
     def rate(options = {})
       Request::Rate.new(@credentials, options).process_request
     end

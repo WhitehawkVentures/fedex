@@ -1,4 +1,4 @@
-require 'old_busted_fedex/shipment'
+require 'fed_ex/shipment'
 
 # Get shipping rates trough Fedex Web Services
 #
@@ -48,8 +48,8 @@ require 'old_busted_fedex/shipment'
 #        @total_freight_discounts=nil,
 #        @total_net_freight="32.1",
 #        @rate_zone="51">
-module OldBustedFedex
-  require 'old_busted_fedex/version'
+module FedEx
+  require 'fed_ex/version'
   #Exceptions: Fedex::RateError
   class RateError < StandardError; end
   class AddressValidationError < StandardError; end

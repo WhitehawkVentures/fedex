@@ -1,6 +1,6 @@
-require 'old_busted_fedex/request/base'
+require 'fed_ex/request/base'
 
-module OldBustedFedex
+module FedEx
   module Request
     class PickupAvailability < Base
       VERSION = 5
@@ -11,7 +11,7 @@ module OldBustedFedex
         @carrier = options[:carrier]
       end
       
-      # Sends post request to OldBustedFedex web service and parse the response
+      # Sends post request to FedEx web service and parse the response
       def process_request
         api_response = self.class.post(api_url, :body => build_xml)
         Rails.logger.info(build_xml)
@@ -51,7 +51,7 @@ module OldBustedFedex
         xml.Carriers @carrier || "FDXG"
       end
       
-      # Build xml OldBustedFedex Web Service request
+      # Build xml FedEx Web Service request
       def build_xml
         builder = Nokogiri::XML::Builder.new do |xml|
           xml.PickupAvailabilityRequest(:xmlns => "http://fedex.com/ws/pickup/v5"){
