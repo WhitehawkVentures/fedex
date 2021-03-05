@@ -8,6 +8,7 @@ module Fedex
       def initialize(credentials, options={})
         super(credentials, options)
         @tracking_number, @tracking_type = options[:tracking_number], (options[:tracking_type] || "TRACKING_NUMBER_OR_DOORTAG")
+        @tracking_number_unique_identifier = options[:tracking_number_unique_identifier]
       end
       
       # Sends post request to Fedex web service and parse the response
@@ -48,7 +49,7 @@ module Fedex
           xml.Value @tracking_number
           xml.Type @tracking_type
         }
-        # xml.TrackingNumberUniqueIdentifier @tracking_number
+        xml.TrackingNumberUniqueIdentifier @tracking_number_unique_identifier if @tracking_number_unique_identifier
         # xml.ShipDateRangeBegin
         # xml.ShipDateRangeEnd
         xml.ShipmentAccountNumber @credentials.account_number
