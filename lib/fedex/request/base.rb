@@ -8,6 +8,9 @@ module Fedex
     class Base
       include Helpers
       include HTTParty
+      
+      ssl_version :TLSv1_2
+      
       format :xml
       # If true the rate method will return the complete response from the Fedex Web Service
       attr_accessor :debug
